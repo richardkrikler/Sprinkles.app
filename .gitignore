@@ -6,3 +6,4 @@
 .DS_Store
 Sprinkles Extension/Resources/*.zip
 Archive.zip
+web-ext/build/*
