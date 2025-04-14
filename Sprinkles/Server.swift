@@ -133,7 +133,6 @@ class Server {
     return HTTPResponse(HTTPStatus.ok, headers: headers, content: combined)
   }
 
-
   private func handleVersionReq(request: HTTPRequest) -> HTTPResponse {
     let bundle = Bundle.main
     let version =
@@ -198,15 +197,25 @@ class Server {
   }
 
   private func injectStyleElement(_ css: String) -> String {
+    let fnName = "_SprinklesInjectStyles_\(randomChars())"
+
     return """
-      function _SprinklesInjectStyles() {
+      ;function \(fnName)() {
+        console.log("Injecting sprinkles styles", `\(css)`);
         var d = document;
         var e = d.createElement('style');
         e.dataset.sprinklesInjected = 1;
         e.innerHTML = `\(css)`;
         d.body.appendChild(e);
       };
-      _SprinklesInjectStyles();
+      \(fnName)();
       """
+  }
+
+  private func randomChars(length: Int = 8) -> String {
+    return String(
+      (0..<8).map { _ in
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".randomElement()!
+      })
   }
 }
