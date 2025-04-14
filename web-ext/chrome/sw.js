@@ -73,7 +73,8 @@ async function reload() {
     domains.map(async (domain) => {
       console.log(`Fetching user script for ${domain}`);
       const code = await fetchScript(domain);
-      await register(domain, code);
+      const matches = [`*://${domain}/*`, `*://www\.${domain}/*`];
+      await register(domain, matches, code);
     })
   );
 }
@@ -95,7 +96,7 @@ async function fetchList() {
 
 async function registerGlobal() {
   const code = await fetchScript("global");
-  register("*", code);
+  register("global", ["*://*/*"], code);
 }
 
 async function fetchScript(domain) {
@@ -104,9 +105,8 @@ async function fetchScript(domain) {
   return code;
 }
 
-async function register(domain, code) {
+async function register(domain, matches, code) {
   console.log(`Registering user script for ${domain}`);
-  const matches = [`*://${domain}/*`, `*://www.${domain}/*`];
   await chrome.userScripts.register([
     {
       id: `user-script-${domain}`,
