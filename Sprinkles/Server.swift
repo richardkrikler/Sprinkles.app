@@ -178,7 +178,7 @@ class Server {
     var javascript = tryReading(jsURL)
     let css = tryReading(cssURL)
     if css != "" {
-      javascript.append(injectStyleElement(css))
+      javascript.append(injectStyleElement(base, css))
     }
 
     return javascript
@@ -196,16 +196,29 @@ class Server {
     return ""
   }
 
-  private func injectStyleElement(_ css: String) -> String {
+  private func injectStyleElement(_ label: String, _ css: String) -> String {
     let fnName = "_SprinklesInjectStyles_\(randomChars())"
 
     return """
       ;function \(fnName)() {
-        console.log("Injecting sprinkles styles", `\(css)`);
+        console.groupCollapsed("Injecting Sprinkles styles (\(label))");
+        console.log(`\(css)`);
+        console.groupEnd();
+
         var d = document;
         var e = d.createElement('style');
         e.dataset.sprinklesInjected = 1;
-        e.innerHTML = `\(css)`;
+
+        var content = `\(css)`;
+        if (window.trustedTypes && trustedTypes.createPolicy) {
+          const escapeHTMLPolicy = trustedTypes.createPolicy("myEscapePolicy", {
+            createHTML: (content) => content.replace(/\\</g, "&lt;"),
+          });
+
+          content = escapeHTMLPolicy.createHTML(content);
+        }
+
+        e.innerHTML = content;
         d.body.appendChild(e);
       };
       \(fnName)();
