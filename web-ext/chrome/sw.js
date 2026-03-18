@@ -26,7 +26,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
 
 async function checkForUpdates() {
   try {
-    const res = await fetch(`https://localhost:3133/v3/checksum.json`);
+    const res = await fetch("https://localhost:3133/v3/checksum.json");
     const { checksum } = await res.json();
 
     if (lastChecksum === null) {
@@ -73,9 +73,9 @@ async function reload() {
     domains.map(async (domain) => {
       console.log(`Fetching user script for ${domain}`);
       const code = await fetchScript(domain);
-      const matches = [`*://${domain}/*`, `*://www\.${domain}/*`];
+      const matches = [`*://${domain}/*`, `*://www.${domain}/*`];
       await register(domain, matches, code);
-    })
+    }),
   );
 }
 
